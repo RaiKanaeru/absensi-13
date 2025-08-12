@@ -39,7 +39,7 @@ function SidebarToggleButton() {
     return (
       <SidebarMenuButton onClick={toggleSidebar} tooltip={state === 'expanded' ? 'Ciutkan' : 'Perluas'}>
         {state === 'collapsed' ? <PanelRight /> : <PanelLeft />}
-        <span>{state === 'expanded' ? 'Ciutkan' : 'Perluas'}</span>
+        <span className='sr-only'>{state === 'expanded' ? 'Ciutkan' : 'Perluas'}</span>
       </SidebarMenuButton>
     );
   }
@@ -85,9 +85,6 @@ export function DashboardSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
-            <SidebarMenuItem>
-                <SidebarToggleButton />
-            </SidebarMenuItem>
           <SidebarMenuItem>
             <Link href="#" passHref>
               <SidebarMenuButton asChild tooltip="Pengaturan">
@@ -98,6 +95,9 @@ export function DashboardSidebar() {
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
+            <SidebarMenuItem>
+                <SidebarToggleButton />
+            </SidebarMenuItem>
         </SidebarMenu>
       </SidebarFooter>
     </Sidebar>
