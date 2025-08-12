@@ -79,6 +79,10 @@ export default function AttendancePage() {
         return 'bg-blue-50';
       case 'Alfa':
         return 'bg-red-50';
+      case 'Sakit':
+        return 'bg-yellow-50';
+      case 'Izin':
+        return 'bg-slate-50';
       default:
         return 'hover:bg-gray-50';
     }
@@ -98,7 +102,7 @@ export default function AttendancePage() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex items-center justify-between">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-slate-800">
             Absensi: {sessionClass?.name}
@@ -122,7 +126,7 @@ export default function AttendancePage() {
             <TableHeader className="bg-slate-50">
               <TableRow>
                 <TableHead>Siswa</TableHead>
-                <TableHead className="text-center">Status Kehadiran</TableHead>
+                <TableHead className="text-center w-[400px]">Status Kehadiran</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -131,7 +135,7 @@ export default function AttendancePage() {
                   key={student.id}
                   className={cn(
                     'border-b transition-colors',
-                    getRowClass(student.attendanceStatus)
+                    getRowClass(attendance[student.id])
                   )}
                 >
                   <TableCell>
@@ -153,11 +157,11 @@ export default function AttendancePage() {
                   </TableCell>
                   <TableCell>
                     <RadioGroup
-                      value={student.attendanceStatus}
+                      value={attendance[student.id] || 'Hadir'}
                       onValueChange={(value) =>
                         handleStatusChange(student.id, value as AttendanceStatus)
                       }
-                      className="flex justify-center gap-2 md:gap-4"
+                      className="flex justify-center gap-2 md:gap-4 flex-wrap"
                     >
                       {attendanceStatuses.map((status) => (
                         <div

@@ -131,7 +131,7 @@ export default function DashboardPage() {
                   (c) => c.id === session.classId
                 );
                 return (
-                  <TableRow key={session.id} className="border-b hover:bg-gray-50">
+                  <TableRow key={session.id}>
                     <TableCell>
                       <div className="font-medium text-slate-800">{sessionClass?.name}</div>
                     </TableCell>
