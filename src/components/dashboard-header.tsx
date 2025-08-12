@@ -21,13 +21,13 @@ export function DashboardHeader() {
         <Input
           type="search"
           placeholder="Cari..."
-          className="w-full rounded-lg bg-secondary pl-8 md:w-[200px] lg:w-[336px]"
+          className="w-full rounded-lg bg-card pl-8 md:w-[200px] lg:w-[336px]"
         />
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger asChild>
           <Button
-            variant="outline"
+            variant="ghost"
             size="icon"
             className="overflow-hidden rounded-full"
           >

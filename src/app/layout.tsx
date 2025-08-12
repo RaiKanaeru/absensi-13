@@ -7,8 +7,8 @@ import { Toaster } from "@/components/ui/toaster"
 const inter = Inter({ subsets: ['latin'], variable: '--font-inter' });
 
 export const metadata: Metadata = {
-  title: 'Smart Attend',
-  description: 'Sistem Absensi Sekolah Cerdas',
+  title: 'Sistem Absensi Kelas',
+  description: 'Aplikasi Web Modern untuk Manajemen Absensi',
 };
 
 export default function RootLayout({
@@ -23,7 +23,7 @@ export default function RootLayout({
         <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
         <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet" />
       </head>
-      <body className={cn('min-h-screen bg-background font-sans antialiased dark', inter.variable)}>
+      <body className={cn('min-h-screen bg-background font-sans antialiased', inter.variable)}>
         {children}
         <Toaster />
       </body>
