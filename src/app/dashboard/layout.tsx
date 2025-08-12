@@ -13,9 +13,7 @@ export default function DashboardLayout({
         <DashboardSidebar />
         <div className="flex flex-col sm:pl-14 group-[[data-state=expanded]]/sidebar-wrapper:sm:pl-64 transition-[padding-left] duration-200">
           <DashboardHeader />
-          <main className="flex-1 p-4 sm:px-6 sm:py-6 md:gap-8">
-            {children}
-          </main>
+          <main className="flex-1 p-6 md:p-8">{children}</main>
         </div>
       </div>
     </SidebarProvider>
