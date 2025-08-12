@@ -1,3 +1,4 @@
+
 'use client';
 
 import Link from 'next/link';
@@ -59,10 +60,10 @@ export function DashboardSidebar() {
                   isActive={pathname === item.href}
                   tooltip={item.label}
                 >
-                  <>
+                  <a>
                     <item.icon className="size-5" />
                     <span>{item.label}</span>
-                  </>
+                  </a>
                 </SidebarMenuButton>
               </Link>
             </SidebarMenuItem>
@@ -74,10 +75,10 @@ export function DashboardSidebar() {
           <SidebarMenuItem>
             <Link href="#" passHref>
               <SidebarMenuButton asChild tooltip="Pengaturan">
-                <>
+                <a>
                   <Settings className="size-5" />
                   <span>Pengaturan</span>
-                </>
+                </a>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
