@@ -45,10 +45,10 @@ export function DashboardSidebar() {
                 className="w-full justify-start text-2xl font-bold"
                 tooltip="Smart Attend"
               >
-                <span>
+                <a>
                   <ClipboardCheck className="size-6 shrink-0" />
                   <span className="sr-only">Smart Attend</span>
-                </span>
+                </a>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
