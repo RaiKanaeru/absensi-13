@@ -16,7 +16,7 @@ import {
 import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import Link from 'next/link';
-import { ArrowUpRight, BookCopy, Users, Activity, ClipboardCheck } from 'lucide-react';
+import { ArrowUpRight, BookCopy, Users, Activity, ClipboardCheck, ArrowUp, ArrowDown } from 'lucide-react';
 import { students, classes, sessions } from '@/lib/data';
 
 export default function DashboardPage() {
@@ -34,8 +34,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{students.length}</div>
-            <p className="text-xs text-muted-foreground">
-              +10.2% dari bulan lalu
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+              <span className='flex items-center text-emerald-500'><ArrowUp className="h-3 w-3" /> 10.2%</span> dari bulan lalu
             </p>
           </CardContent>
         </Card>
@@ -46,8 +46,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">{classes.length}</div>
-            <p className="text-xs text-muted-foreground">
-              +2 dari tahun lalu
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+               <span className='flex items-center text-emerald-500'><ArrowUp className="h-3 w-3" /> 2</span> dari tahun lalu
             </p>
           </CardContent>
         </Card>
@@ -60,8 +60,8 @@ export default function DashboardPage() {
           </CardHeader>
           <CardContent>
             <div className="text-2xl font-bold">92.5%</div>
-            <p className="text-xs text-muted-foreground">
-              +5.1% dari kemarin
+            <p className="text-xs text-muted-foreground flex items-center gap-1">
+               <span className='flex items-center text-red-500'><ArrowDown className="h-3 w-3" /> 5.1%</span> dari kemarin
             </p>
           </CardContent>
         </Card>

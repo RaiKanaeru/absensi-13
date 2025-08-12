@@ -12,21 +12,20 @@ import {
   SidebarFooter,
 } from '@/components/ui/sidebar';
 import {
-  LayoutDashboard,
+  Home,
   Users,
   BookCopy,
   ClipboardCheck,
   BarChart,
   Settings,
-  LogOut,
+  PanelLeft,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
-import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
 
 const menuItems = [
-  { href: '/dashboard', label: 'Dashboard', icon: LayoutDashboard },
-  { href: '/dashboard/classes', label: 'Manajemen Kelas', icon: BookCopy },
-  { href: '/dashboard/users', label: 'Manajemen Pengguna', icon: Users },
+  { href: '/dashboard', label: 'Dashboard', icon: Home },
+  { href: '/dashboard/classes', label: 'Kelas', icon: BookCopy },
+  { href: '/dashboard/users', label: 'Pengguna', icon: Users },
   { href: '/dashboard/attendance', label: 'Absensi', icon: ClipboardCheck },
   { href: '/dashboard/reports', label: 'Laporan', icon: BarChart },
 ];
@@ -35,14 +34,23 @@ export function DashboardSidebar() {
   const pathname = usePathname();
 
   return (
-    <Sidebar>
-      <SidebarHeader>
-        <div className="p-2">
-           <Logo />
-        </div>
-      </SidebarHeader>
+    <Sidebar side="left" collapsible="icon" variant="sidebar">
       <SidebarContent>
         <SidebarMenu>
+          <SidebarMenuItem>
+            <Link href="#" passHref>
+              <SidebarMenuButton
+                asChild
+                className="w-full justify-start text-2xl font-bold"
+                tooltip="Smart Attend"
+              >
+                <>
+                  <ClipboardCheck className="size-6 shrink-0" />
+                  <span className="sr-only">Smart Attend</span>
+                </>
+              </SidebarMenuButton>
+            </Link>
+          </SidebarMenuItem>
           {menuItems.map((item) => (
             <SidebarMenuItem key={item.href}>
               <Link href={item.href} passHref>
@@ -52,7 +60,7 @@ export function DashboardSidebar() {
                   tooltip={item.label}
                 >
                   <>
-                    <item.icon />
+                    <item.icon className="size-5" />
                     <span>{item.label}</span>
                   </>
                 </SidebarMenuButton>
@@ -64,26 +72,16 @@ export function DashboardSidebar() {
       <SidebarFooter>
         <SidebarMenu>
           <SidebarMenuItem>
-             <Link href="/login" passHref>
-              <SidebarMenuButton asChild tooltip="Keluar">
+            <Link href="#" passHref>
+              <SidebarMenuButton asChild tooltip="Pengaturan">
                 <>
-                  <LogOut />
-                  <span>Keluar</span>
+                  <Settings className="size-5" />
+                  <span>Pengaturan</span>
                 </>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
         </SidebarMenu>
-        <div className="flex items-center gap-3 p-4">
-          <Avatar>
-            <AvatarImage src="https://placehold.co/100x100" alt="Admin" data-ai-hint="user avatar" />
-            <AvatarFallback>AS</AvatarFallback>
-          </Avatar>
-          <div className="flex flex-col">
-            <span className="font-semibold text-sm">Admin Sekolah</span>
-            <span className="text-xs text-muted-foreground">admin@sekolah.id</span>
-          </div>
-        </div>
       </SidebarFooter>
     </Sidebar>
   );
