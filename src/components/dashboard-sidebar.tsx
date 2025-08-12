@@ -11,6 +11,7 @@ import {
   SidebarMenuItem,
   SidebarMenuButton,
   SidebarFooter,
+  useSidebar,
 } from '@/components/ui/sidebar';
 import {
   Home,
@@ -20,6 +21,7 @@ import {
   BarChart,
   Settings,
   PanelLeft,
+  PanelRight,
 } from 'lucide-react';
 import { Logo } from '@/components/logo';
 
@@ -31,12 +33,23 @@ const menuItems = [
   { href: '/dashboard/reports', label: 'Laporan', icon: BarChart },
 ];
 
+function SidebarToggleButton() {
+    const { state, toggleSidebar } = useSidebar();
+  
+    return (
+      <SidebarMenuButton onClick={toggleSidebar} tooltip={state === 'expanded' ? 'Ciutkan' : 'Perluas'}>
+        {state === 'collapsed' ? <PanelRight /> : <PanelLeft />}
+        <span>{state === 'expanded' ? 'Ciutkan' : 'Perluas'}</span>
+      </SidebarMenuButton>
+    );
+  }
+
 export function DashboardSidebar() {
   const pathname = usePathname();
 
   return (
     <Sidebar side="left" collapsible="icon" variant="sidebar">
-      <SidebarContent>
+      <SidebarContent className="flex-1">
         <SidebarMenu>
           <SidebarMenuItem>
             <Link href="#" passHref>
@@ -72,6 +85,9 @@ export function DashboardSidebar() {
       </SidebarContent>
       <SidebarFooter>
         <SidebarMenu>
+            <SidebarMenuItem>
+                <SidebarToggleButton />
+            </SidebarMenuItem>
           <SidebarMenuItem>
             <Link href="#" passHref>
               <SidebarMenuButton asChild tooltip="Pengaturan">
