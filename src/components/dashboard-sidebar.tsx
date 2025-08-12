@@ -1,11 +1,9 @@
-
 'use client';
 
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import {
   Sidebar,
-  SidebarHeader,
   SidebarContent,
   SidebarMenu,
   SidebarMenuItem,
@@ -58,10 +56,10 @@ export function DashboardSidebar() {
                 className="w-full justify-start text-2xl font-bold"
                 tooltip="Smart Attend"
               >
-                <a>
+                <span className='flex items-center gap-2'>
                   <ClipboardCheck className="size-6 shrink-0" />
-                  <span className="sr-only">Smart Attend</span>
-                </a>
+                  <span className="font-bold text-primary">Smart Attend</span>
+                </span>
               </SidebarMenuButton>
             </Link>
           </SidebarMenuItem>
