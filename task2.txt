@@ -1,0 +1,113 @@
+### **TASK.TXT — Fase 2: Modernisasi UI/UX & Pematangan Aplikasi**
+
+**Stack Utama:** Frontend (Next.js App Router, TypeScript, Tailwind, shadcn/ui), Backend (Node.js + Express, MySQL), AI (Scaffold)
+
+**Tujuan Utama Fase Ini:** Merombak total antarmuka pengguna (UI) agar lebih modern, responsif, dan intuitif sesuai dengan `blueprint.md`, serta menyelesaikan hutang teknis (technical debt) di area pengujian, validasi, dan keamanan.
+
+---
+
+### **1) UI/UX OVERHAUL (Prioritas Utama)** 💎
+*Tujuan: Mengimplementasikan desain modern dan responsif dari `blueprint.md` di seluruh aplikasi.*
+
+- [ ] **1.1. Inisialisasi Fondasi Desain Baru**
+    - [ ] Konfigurasi `tailwind.config.ts` untuk menggunakan palet warna primer (`#9D4EDD`), background (`#F5EEFF`), dan aksen (`#5C84E6`) dari `blueprint.md`.
+    - [ ] Atur font `Inter` sebagai font utama untuk body dan heading di `layout.tsx`.
+    - [ ] Buat file `globals.css` untuk menerapkan gaya dasar yang konsisten (misalnya, warna background, anti-aliasing font).
+
+- [ ] **1.2. Perombakan Komponen Inti (Core Components)**
+    - [ ] **Dashboard Layout:** Desain ulang `dashboard-header.tsx` dan `dashboard-sidebar.tsx` agar lebih bersih, modern, dan menggunakan ikon-ikon baru yang simpel.
+    - [ ] **Kartu (Cards):** Buat variasi komponen `<Card>` dari shadcn/ui dengan gaya baru untuk menampilkan statistik dan informasi. Tambahkan efek *subtle shadow* dan *border-radius* yang konsisten.
+    - [ ] **Tombol (Buttons):** Kustomisasi komponen `<Button>` agar memiliki varian warna primer dan aksen. Tambahkan efek transisi halus saat hover.
+    - [ ] **Formulir (Forms):** Desain ulang semua input, select, dan radio button agar sesuai dengan tema baru. Pastikan pesan error validasi ditampilkan dengan jelas dan tidak mengganggu.
+
+- [ ] **1.3. Perombakan Halaman (Page Redesign)**
+    - [ ] **Halaman Login (`/login`):** Ganti layout menjadi lebih menarik secara visual, mungkin dengan ilustrasi atau gradien latar belakang. Pusatkan form login dengan jelas.
+    - [ ] **Halaman Dashboard (`/dashboard`):**
+        - Ganti ringkasan statistik menjadi lebih visual, pertimbangkan menggunakan chart sederhana (misalnya dengan `recharts`).
+        - Desain ulang kartu "Sesi Hari Ini" dan "Prediksi Ketidakhadiran" agar lebih menonjol.
+        - Terapkan animasi halus (misalnya, `framer-motion`) saat data dimuat untuk memberikan efek "fade-in".
+    - [ ] **Halaman Tabel (Kelas, Pengguna):**
+        - Implementasikan `TanStack Table` (yang menjadi dasar `DataTable` shadcn/ui) untuk fitur sorting, filtering, dan pagination yang lebih kaya.
+        - Desain ulang tampilan tabel: header, baris, dan aksi (edit/delete) agar lebih bersih dan memiliki *spacing* yang baik.
+    - [ ] **Halaman Absensi (`/attendance`):**
+        - Buat layout yang lebih ramah di perangkat mobile.
+        - Visualisasikan status kehadiran (Hadir, Izin, Sakit, dll.) dengan warna dan ikon yang lebih jelas, bukan hanya radio button.
+        - Pastikan toolbar "Tandai Semua Hadir" dan "Simpan" tetap terlihat (sticky) saat di-scroll.
+    - [ ] **Halaman Laporan (`/reports`):**
+        - Tampilkan data laporan dalam bentuk chart (misalnya, bar chart untuk perbandingan S/I/A) selain tabel.
+        - Permudah interaksi filter bulan dan tahun.
+
+- [ ] **1.4. Audit Responsivitas & Aksesibilitas (Wajib)**
+    - [ ] Uji dan perbaiki semua halaman di berbagai ukuran layar (mobile, tablet, desktop).
+    - [ ] Pastikan semua elemen interaktif dapat diakses menggunakan keyboard.
+    - [ ] Verifikasi kontras warna memenuhi standar WCAG AA.
+
+---
+
+### **2) PEMATANGAN BACKEND & KEAMANAN** ⚙️
+*Tujuan: Memperkuat logika bisnis, validasi, dan keamanan di sisi server.*
+
+- [ ] **2.1. Validasi Input Menyeluruh**
+    - [ ] Implementasikan `zod` di semua rute API (backend) untuk memvalidasi `request.body`, `request.query`, dan `request.params`. (Ref: `task.txt` lama 4.3).
+    - [ ] Buat middleware error handler yang seragam untuk menangani error validasi dari `zod` dan mengembalikan respons 400 yang informatif.
+
+- [ ] **2.2. Peningkatan Keamanan**
+    - [ ] Tambahkan proteksi CSRF (misalnya, menggunakan library `csurf`) jika token akan dipindah ke *cookies*.
+    - [ ] Implementasikan mekanisme *Refresh Token* untuk meningkatkan keamanan sesi dan menghindari penyimpanan JWT yang berumur panjang di `localStorage`.
+    - [ ] Tinjau kembali konfigurasi `helmet` dan `express-rate-limit` untuk production.
+
+- [ ] **2.3. Database & Logging**
+    - [ ] Buat sistem migrasi database (misalnya, menggunakan `db-migrate`) untuk mengelola perubahan skema secara terstruktur. (Ref: `task.txt` lama 3.2).
+    - [ ] Perbaiki skrip *seeding* data agar lebih komprehensif (`dev_bootstrap.sql`).
+    - [ ] Konfigurasi `morgan` untuk mencatat log dengan format `combined` dan tambahkan *request-id* untuk memudahkan *tracing*. (Ref: `task.txt` lama 4.6).
+
+---
+
+### **3) PENGUJIAN OTOMATIS (Automated Testing)** 🧪
+*Tujuan: Membangun jaring pengaman untuk memastikan kualitas dan mencegah regresi.*
+
+- [ ] **3.1. Unit Tests (Vitest/Jest)**
+    - [ ] Buat unit test untuk fungsi-fungsi utilitas di `src/lib/utils.ts`.
+    - [ ] Buat unit test untuk *controller* backend, terutama logika bisnis yang kompleks seperti agregasi laporan dan pencatatan absensi.
+
+- [ ] **3.2. Integration Tests (Vitest/Jest + Supertest)**
+    - [ ] Buat integration test untuk alur API utama: `POST /auth/login`, `POST /attendance/record`, dan `GET /reports/class/:id`.
+    - [ ] Pastikan *middleware* otentikasi dan otorisasi (RBAC) berfungsi dengan benar.
+
+- [ ] **3.3. End-to-End (E2E) Tests (Playwright/Cypress)**
+    - [ ] Buat skenario E2E untuk alur kritis: Login → Melihat Dashboard → Mengisi Absensi → Melihat Laporan → Logout.
+    - [ ] Buat skenario E2E untuk alur admin: Login → Mengelola Pengguna (CRUD).
+
+---
+
+### **4) FITUR AI - PREDICTIVE ATTENDANCE** 🤖
+*Tujuan: Mengimplementasikan fungsionalitas prediksi dari yang semula hanya *scaffold*.*
+
+- [ ] **4.1. Backend Service:** Buat service di backend untuk mengagregasi data absensi historis per siswa. (Ref: `task.txt` lama 8.1).
+- [ ] **4.2. Scoring Logic:** Kembangkan fungsi *scoring* sederhana untuk mengidentifikasi siswa yang berisiko berdasarkan ambang batas (misal, >3 kali alpa dalam sebulan). (Ref: `task.txt` lama 8.2).
+- [ ] **4.3. API Endpoint:** Buat endpoint API baru `GET /api/ai/alerts?classId=...` yang dilindungi dan hanya bisa diakses oleh guru/admin. (Ref: `task.txt` lama 8.3).
+- [ ] **4.4. Integrasi UI:** Hubungkan kartu "Prediksi Ketidakhadiran" di Dashboard dengan endpoint API baru. (Ref: `task.txt` lama 8.4).
+- [ ] **4.5. Jadwal Cron:** Buat sebuah *cron job* (misalnya dengan `node-cron`) untuk menjalankan ulang kalkulasi prediksi setiap hari. (Ref: `task.txt` lama 8.5).
+
+---
+
+### **5) DOKUMENTASI & DEVOPS** 📚
+*Tujuan: Melengkapi dokumentasi dan menyederhanakan proses deployment.*
+
+- [ ] **5.1. Perbarui Dokumentasi**
+    - [ ] Buat *sequence diagram* untuk alur Login, Absensi, dan Laporan di `docs/flows.md`. (Ref: `task.txt` lama 2.1).
+    - [ ] Perbarui `docs/openapi.yaml` jika ada perubahan atau penambahan endpoint API.
+    - [ ] Hapus semua file *mock data* dan kode yang tidak terpakai (*dead code*). (Ref: `task.txt` lama 12.4).
+- [ ] **5.2. Peningkatan DevOps**
+    - [ ] Buat `Dockerfile` dan `docker-compose.yml` untuk memudahkan setup lokal dan persiapan deployment. (Ref: `task.txt` lama 11.2).
+    - [ ] Buat pipeline CI sederhana di GitHub Actions untuk menjalankan `lint`, `typecheck`, dan `test` pada setiap *push*. (Ref: `task.txt` lama 11.3).
+
+---
+
+### **DEFINISI SELESAI (Definition of Done)** ✅
+- [ ] Semua tugas dalam seksi "UI/UX Overhaul" telah selesai dan disetujui.
+- [ ] Aplikasi 100% responsif dan berfungsi baik di perangkat mobile dan desktop.
+- [ ] Semua *endpoint* API utama telah dilindungi oleh validasi `zod`.
+- [ ] *Testing coverage* mencapai target minimal (misal: 60% untuk unit & integration test).
+- [ ] Fitur AI Prediksi berfungsi *end-to-end*.
+- [ ] Semua item dalam *checklist* ini telah ditandai selesai.

@@ -1,6 +1,6 @@
 'use client';
 
-import { useFormState, useFormStatus } from 'react-dom';
+import { useActionState, useFormStatus } from 'react';
 import {
   Card,
   CardContent,
@@ -20,7 +20,8 @@ import {
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { runPredictiveAttendanceAlert, type FormState } from '@/app/actions';
-import { students } from '@/lib/data';
+import { useEffect, useState } from 'react';
+import { classesAPI } from '@/lib/api';
 import { AlertCircle, CheckCircle, Bot } from 'lucide-react';
 
 const initialState: FormState = {
@@ -39,10 +40,26 @@ function SubmitButton() {
 }
 
 export function PredictiveAlertCard() {
-  const [state, formAction] = useFormState(
+  const [state, formAction, isPending] = useActionState(
     runPredictiveAttendanceAlert,
     initialState
   );
+  const [students, setStudents] = useState<Array<{ id:number; full_name:string }>>([]);
+
+  useEffect(() => {
+    // Placeholder: sebaiknya ada endpoint /classes/:id/students atau /students?
+    // Agar demo jalan tanpa pilih kelas, biarkan kosong jika belum ada kelas terpilih
+    (async () => {
+      try {
+        const res = await classesAPI.list();
+        const first = res.data?.data?.[0]?.id;
+        if (first) {
+          const s = await classesAPI.students(first);
+          setStudents(s.data?.data || []);
+        }
+      } catch {}
+    })();
+  }, []);
 
   return (
     <Card>
@@ -66,8 +83,8 @@ export function PredictiveAlertCard() {
               </SelectTrigger>
               <SelectContent>
                 {students.map((student) => (
-                  <SelectItem key={student.id} value={student.id}>
-                    {student.name}
+                  <SelectItem key={student.id} value={String(student.id)}>
+                    {student.full_name}
                   </SelectItem>
                 ))}
               </SelectContent>

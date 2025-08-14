@@ -1,10 +1,12 @@
+"use client";
+
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -12,15 +14,15 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+} from "@/components/ui/table";
+import { MoreHorizontal, PlusCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
+} from "@/components/ui/dropdown-menu";
 import {
   Dialog,
   DialogContent,
@@ -29,19 +31,18 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { users } from '@/lib/data';
+} from "@/components/ui/select";
 
 export default function UsersPage() {
   return (
@@ -72,18 +73,18 @@ export default function UsersPage() {
               </DialogHeader>
               <div className="grid gap-4 py-4">
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="name" className="text-right">
-                    Nama
+                  <Label htmlFor="username" className="text-right">
+                    Username
                   </Label>
-                  <Input id="name" value="John Doe" className="col-span-3" />
+                  <Input id="username" className="col-span-3" />
                 </div>
                 <div className="grid grid-cols-4 items-center gap-4">
-                  <Label htmlFor="email" className="text-right">
-                    Email
+                  <Label htmlFor="password" className="text-right">
+                    Password
                   </Label>
-                  <Input id="email" value="john.d@example.com" className="col-span-3" />
+                  <Input id="password" type="password" className="col-span-3" />
                 </div>
-                 <div className="grid grid-cols-4 items-center gap-4">
+                <div className="grid grid-cols-4 items-center gap-4">
                   <Label htmlFor="role" className="text-right">
                     Peran
                   </Label>
@@ -92,9 +93,10 @@ export default function UsersPage() {
                       <SelectValue placeholder="Pilih peran" />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="Admin">Admin</SelectItem>
-                      <SelectItem value="Teacher">Guru</SelectItem>
-                      <SelectItem value="Student">Siswa</SelectItem>
+                      <SelectItem value="admin">Admin</SelectItem>
+                      <SelectItem value="guru">Guru</SelectItem>
+                      <SelectItem value="wali_kelas">Wali Kelas</SelectItem>
+                      <SelectItem value="siswa">Siswa</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -119,32 +121,50 @@ export default function UsersPage() {
             </TableRow>
           </TableHeader>
           <TableBody>
-            {users.map((user) => (
-              <TableRow key={user.id}>
-                <TableCell className="font-medium">{user.name}</TableCell>
-                <TableCell>{user.email}</TableCell>
-                <TableCell>
-                  <Badge variant={user.role === 'Admin' ? 'default' : 'secondary'}>
-                    {user.role}
-                  </Badge>
-                </TableCell>
-                <TableCell>
-                  <DropdownMenu>
-                    <DropdownMenuTrigger asChild>
-                      <Button aria-haspopup="true" size="icon" variant="ghost">
-                        <MoreHorizontal className="h-4 w-4" />
-                        <span className="sr-only">Toggle menu</span>
-                      </Button>
-                    </DropdownMenuTrigger>
-                    <DropdownMenuContent align="end">
-                      <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                      <DropdownMenuItem>Ubah</DropdownMenuItem>
-                      <DropdownMenuItem>Hapus</DropdownMenuItem>
-                    </DropdownMenuContent>
-                  </DropdownMenu>
-                </TableCell>
-              </TableRow>
-            ))}
+            <TableRow>
+              <TableCell className="font-medium">John Doe</TableCell>
+              <TableCell>john.doe@example.com</TableCell>
+              <TableCell>
+                <Badge variant="default">Admin</Badge>
+              </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                    <DropdownMenuItem>Ubah</DropdownMenuItem>
+                    <DropdownMenuItem>Hapus</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium">Jane Smith</TableCell>
+              <TableCell>jane.smith@example.com</TableCell>
+              <TableCell>
+                <Badge variant="secondary">Guru</Badge>
+              </TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                    <DropdownMenuItem>Ubah</DropdownMenuItem>
+                    <DropdownMenuItem>Hapus</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </CardContent>

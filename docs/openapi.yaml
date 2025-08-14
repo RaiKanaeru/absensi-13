@@ -1,0 +1,665 @@
+openapi: 3.0.0
+info:
+  title: Absensi API
+  description: API untuk sistem absensi kelas SMKN 13 Bandung
+  version: 1.0.0
+  contact:
+    name: Development Team
+    email: dev@smkn13bandung.sch.id
+
+servers:
+  - url: http://localhost:3000/api
+    description: Development server
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+
+  schemas:
+    User:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: User ID
+        username:
+          type: string
+          description: Username untuk login
+        role:
+          type: string
+          enum: [admin, guru, wali_kelas, sisw]
+          description: Role pengguna
+        full_name:
+          type: string
+          description: Nama lengkap (untuk guru)
+        nip:
+          type: string
+          description: NIP guru (jika role guru)
+
+    Class:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Class ID
+        class_name:
+          type: string
+          description: Nama kelas (contoh: X AK 1)
+        grade_level:
+          type: string
+          enum: [X, XI, XII, XIII]
+          description: Tingkat kelas
+        major:
+          type: string
+          description: Jurusan (contoh: AK, TKJ)
+        homeroom_teacher_name:
+          type: string
+          description: Nama wali kelas
+
+    Student:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Student ID
+        nis:
+          type: string
+          description: Nomor Induk Siswa
+        full_name:
+          type: string
+          description: Nama lengkap siswa
+        gender:
+          type: string
+          enum: [L, P]
+          description: Jenis kelamin
+
+    AttendanceStatus:
+      type: string
+      enum: [Hadir, Izin, Sakit, Alpa, Terlambat]
+      description: Status kehadiran siswa
+
+    StudentAttendance:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Student ID
+        nis:
+          type: string
+          description: NIS
+        full_name:
+          type: string
+          description: Nama lengkap
+        status:
+          $ref: '#/components/schemas/AttendanceStatus'
+          description: Status kehadiran
+
+    Schedule:
+      type: object
+      properties:
+        id:
+          type: integer
+          description: Schedule ID
+        class_name:
+          type: string
+          description: Nama kelas
+        subject_name:
+          type: string
+          description: Nama mata pelajaran
+        start_time:
+          type: string
+          format: time
+          description: Waktu mulai
+        end_time:
+          type: string
+          format: time
+          description: Waktu selesai
+
+    ApiResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          description: Status operasi
+        data:
+          description: Data response
+        message:
+          type: string
+          description: Pesan response
+        error:
+          type: string
+          description: Error message (jika ada)
+
+paths:
+  /auth/login:
+    post:
+      summary: Login user
+      description: Authenticate user dan dapatkan JWT token
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+              properties:
+                username:
+                  type: string
+                  description: Username
+                password:
+                  type: string
+                  description: Password
+      responses:
+        '200':
+          description: Login berhasil
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          token:
+                            type: string
+                            description: JWT token
+                          user:
+                            $ref: '#/components/schemas/User'
+        '401':
+          description: Kredensial salah
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /auth/me:
+    get:
+      summary: Get current user profile
+      description: Dapatkan profil user dari JWT token
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Profil user
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '401':
+          description: Token tidak valid
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+
+  /classes:
+    get:
+      summary: Get all classes
+      description: Dapatkan daftar semua kelas aktif
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar kelas
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Class'
+
+  /classes/{id}:
+    get:
+      summary: Get class by ID
+      description: Dapatkan detail kelas berdasarkan ID
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Class ID
+      responses:
+        '200':
+          description: Detail kelas
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/Class'
+        '404':
+          description: Kelas tidak ditemukan
+
+  /classes/{id}/students:
+    get:
+      summary: Get students in class
+      description: Dapatkan daftar siswa dalam kelas
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Class ID
+      responses:
+        '200':
+          description: Daftar siswa
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Student'
+
+  /users:
+    get:
+      summary: Get all users (admin only)
+      description: Dapatkan daftar semua pengguna
+      security:
+        - BearerAuth: []
+      responses:
+        '200':
+          description: Daftar pengguna
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/User'
+        '403':
+          description: Akses ditolak (bukan admin)
+
+    post:
+      summary: Create new user (admin only)
+      description: Buat pengguna baru
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - password
+                - role
+              properties:
+                username:
+                  type: string
+                  description: Username
+                password:
+                  type: string
+                  description: Password
+                role:
+                  type: string
+                  enum: [admin, guru, wali_kelas, sisw]
+                  description: Role pengguna
+      responses:
+        '201':
+          description: User berhasil dibuat
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '400':
+          description: Data tidak valid
+        '403':
+          description: Akses ditolak
+
+  /users/{id}:
+    put:
+      summary: Update user (admin only)
+      description: Update data pengguna
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - username
+                - role
+              properties:
+                username:
+                  type: string
+                  description: Username
+                password:
+                  type: string
+                  description: Password (optional untuk update)
+                role:
+                  type: string
+                  enum: [admin, guru, wali_kelas, sisw]
+                  description: Role pengguna
+      responses:
+        '200':
+          description: User berhasil diupdate
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        $ref: '#/components/schemas/User'
+        '404':
+          description: User tidak ditemukan
+
+    delete:
+      summary: Delete user (admin only)
+      description: Hapus pengguna
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: User ID
+      responses:
+        '200':
+          description: User berhasil dihapus
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/ApiResponse'
+        '404':
+          description: User tidak ditemukan
+
+  /attendance/teacher/{teacherId}/today:
+    get:
+      summary: Get today's schedules for teacher
+      description: Dapatkan jadwal hari ini untuk guru tertentu
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: teacherId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Teacher ID
+      responses:
+        '200':
+          description: Daftar jadwal hari ini
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: array
+                        items:
+                          $ref: '#/components/schemas/Schedule'
+
+  /attendance/schedule/{scheduleId}:
+    get:
+      summary: Get attendance form data
+      description: Dapatkan data untuk form absensi (daftar siswa dan status)
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: scheduleId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Schedule ID
+        - name: date
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date
+          description: Tanggal absensi (YYYY-MM-DD)
+      responses:
+        '200':
+          description: Data form absensi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          schedule:
+                            $ref: '#/components/schemas/Schedule'
+                          attendance_date:
+                            type: string
+                            format: date
+                          session_id:
+                            type: integer
+                          students:
+                            type: array
+                            items:
+                              $ref: '#/components/schemas/StudentAttendance'
+
+  /attendance/record:
+    post:
+      summary: Record attendance
+      description: Simpan data absensi siswa
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required:
+                - schedule_id
+                - attendance_date
+                - records
+              properties:
+                schedule_id:
+                  type: integer
+                  description: Schedule ID
+                attendance_date:
+                  type: string
+                  format: date
+                  description: Tanggal absensi
+                records:
+                  type: array
+                  items:
+                    type: object
+                    required:
+                      - student_id
+                      - status
+                    properties:
+                      student_id:
+                        type: integer
+                        description: Student ID
+                      status:
+                        $ref: '#/components/schemas/AttendanceStatus'
+      responses:
+        '200':
+          description: Absensi berhasil disimpan
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          session_id:
+                            type: integer
+                          total_records:
+                            type: integer
+
+  /reports/class/{classId}:
+    get:
+      summary: Get class attendance report
+      description: Dapatkan laporan absensi kelas untuk periode tertentu
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: classId
+          in: path
+          required: true
+          schema:
+            type: integer
+          description: Class ID
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          description: Bulan (1-12)
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Tahun
+      responses:
+        '200':
+          description: Laporan absensi
+          content:
+            application/json:
+              schema:
+                allOf:
+                  - $ref: '#/components/schemas/ApiResponse'
+                  - type: object
+                    properties:
+                      data:
+                        type: object
+                        properties:
+                          class:
+                            $ref: '#/components/schemas/Class'
+                          month:
+                            type: integer
+                          year:
+                            type: integer
+                          students:
+                            type: array
+                            items:
+                              type: object
+                              properties:
+                                id:
+                                  type: integer
+                                nis:
+                                  type: string
+                                full_name:
+                                  type: string
+                                sakit:
+                                  type: integer
+                                izin:
+                                  type: integer
+                                alpa:
+                                  type: integer
+                                persentase_hadir:
+                                  type: string
+
+  /reports/export:
+    get:
+      summary: Export attendance report to Excel
+      description: Export laporan absensi ke file Excel
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: classId
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Class ID
+        - name: month
+          in: query
+          required: true
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 12
+          description: Bulan (1-12)
+        - name: year
+          in: query
+          required: true
+          schema:
+            type: integer
+          description: Tahun
+      responses:
+        '200':
+          description: File Excel
+          content:
+            application/vnd.openxmlformats-officedocument.spreadsheetml.sheet:
+              schema:
+                type: string
+                format: binary
+
+  /health:
+    get:
+      summary: Health check
+      description: Endpoint untuk mengecek status server
+      responses:
+        '200':
+          description: Server sehat
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                  message:
+                    type: string

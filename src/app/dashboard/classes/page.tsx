@@ -1,10 +1,12 @@
+"use client";
+
 import {
   Card,
   CardContent,
   CardDescription,
   CardHeader,
   CardTitle,
-} from '@/components/ui/card';
+} from "@/components/ui/card";
 import {
   Table,
   TableBody,
@@ -12,7 +14,7 @@ import {
   TableHead,
   TableHeader,
   TableRow,
-} from '@/components/ui/table';
+} from "@/components/ui/table";
 import {
   Dialog,
   DialogContent,
@@ -21,26 +23,25 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { MoreHorizontal, PlusCircle } from 'lucide-react';
+} from "@/components/ui/dialog";
+import { MoreHorizontal, PlusCircle } from "lucide-react";
 import {
   DropdownMenu,
   DropdownMenuContent,
   DropdownMenuItem,
   DropdownMenuLabel,
   DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
-import { Button } from '@/components/ui/button';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
+} from "@/components/ui/dropdown-menu";
+import { Button } from "@/components/ui/button";
+import { Label } from "@/components/ui/label";
+import { Input } from "@/components/ui/input";
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@/components/ui/select';
-import { classes, teachers, students } from '@/lib/data';
+} from "@/components/ui/select";
 
 export default function ClassesPage() {
   return (
@@ -85,11 +86,8 @@ export default function ClassesPage() {
                       <SelectValue placeholder="Pilih guru" />
                     </SelectTrigger>
                     <SelectContent>
-                      {teachers.map((teacher) => (
-                        <SelectItem key={teacher.id} value={teacher.id}>
-                          {teacher.name}
-                        </SelectItem>
-                      ))}
+                      {/* TODO: isi dari API teachers */}
+                      <SelectItem value="-">—</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
@@ -107,45 +105,50 @@ export default function ClassesPage() {
             <TableRow>
               <TableHead>Nama Kelas</TableHead>
               <TableHead>Guru Wali</TableHead>
-              <TableHead>Jumlah Siswa</TableHead>
               <TableHead>
                 <span className="sr-only">Aksi</span>
               </TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
-            {classes.map((c) => {
-              const teacher = teachers.find((t) => t.id === c.teacherId);
-              const studentCount = students.filter(
-                (s) => s.classId === c.id
-              ).length;
-              return (
-                <TableRow key={c.id}>
-                  <TableCell className="font-medium">{c.name}</TableCell>
-                  <TableCell>{teacher?.name || 'Belum ditugaskan'}</TableCell>
-                  <TableCell>{studentCount}</TableCell>
-                  <TableCell>
-                    <DropdownMenu>
-                      <DropdownMenuTrigger asChild>
-                        <Button
-                          aria-haspopup="true"
-                          size="icon"
-                          variant="ghost"
-                        >
-                          <MoreHorizontal className="h-4 w-4" />
-                          <span className="sr-only">Toggle menu</span>
-                        </Button>
-                      </DropdownMenuTrigger>
-                      <DropdownMenuContent align="end">
-                        <DropdownMenuLabel>Aksi</DropdownMenuLabel>
-                        <DropdownMenuItem>Ubah</DropdownMenuItem>
-                        <DropdownMenuItem>Hapus</DropdownMenuItem>
-                      </DropdownMenuContent>
-                    </DropdownMenu>
-                  </TableCell>
-                </TableRow>
-              );
-            })}
+            <TableRow>
+              <TableCell className="font-medium">Kelas 10-A</TableCell>
+              <TableCell>Budi Santoso</TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                    <DropdownMenuItem>Ubah</DropdownMenuItem>
+                    <DropdownMenuItem>Hapus</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
+            <TableRow>
+              <TableCell className="font-medium">Kelas 11-B</TableCell>
+              <TableCell>Siti Aminah</TableCell>
+              <TableCell>
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button aria-haspopup="true" size="icon" variant="ghost">
+                      <MoreHorizontal className="h-4 w-4" />
+                      <span className="sr-only">Toggle menu</span>
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>Aksi</DropdownMenuLabel>
+                    <DropdownMenuItem>Ubah</DropdownMenuItem>
+                    <DropdownMenuItem>Hapus</DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              </TableCell>
+            </TableRow>
           </TableBody>
         </Table>
       </CardContent>

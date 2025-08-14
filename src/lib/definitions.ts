@@ -28,7 +28,7 @@ export type Session = {
   topic: string;
 };
 
-export type AttendanceStatus = 'Hadir' | 'Izin' | 'Sakit' | 'Alfa';
+export type AttendanceStatus = 'Hadir' | 'Izin' | 'Sakit' | 'Alpa';
 
 export type Attendance = {
   id: string;

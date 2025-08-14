@@ -1,0 +1,223 @@
+TASK.TXT — Modernisasi & Finalisasi Aplikasi Absensi
+Stack: Frontend (Next.js App Router, TypeScript, Tailwind, shadcn/ui, Axios), Backend (Node.js + Express, MySQL mysql2/promise, JWT, RBAC), Export (ExcelJS), AI (scaffold prediksi kehadiran)
+
+============================================================
+0) WAJIB DIBACA — PEMERIKSAAN 1–1 FUNGSI & AUDIT FILE
+============================================================
+Tujuan: memastikan SELURUH fungsi berjalan, fungsi yang hilang dibuat, dan aplikasi siap pakai end-to-end.
+
+[x] 0.1 Audit struktur repo (frontend & backend)
+    - Buat file /docs/AUDIT.md berisi daftar file + deskripsi singkat fungsinya.
+    - Tandai file yang tidak terpakai (dead code) untuk dihapus atau diarsipkan.
+
+[ ] 0.2 Audit fungsi satu per satu (periksa semua berkas secara mendetail)
+    - Backend:
+      [ ] List semua route (router.*) dan mapping ke controller/handler.
+      [ ] Pastikan SETIAP route memiliki handler yang di-export dan ter-tes minimal smoke.
+      [ ] Cek middleware autentikasi/otorisasi dipasang di route yang tepat.
+      [ ] Pastikan semua handler return pola JSON konsisten: { success, data, message, error? }.
+      [ ] Cari TODO/FIXME dan selesaikan atau buat tiket lanjutan.
+    - Frontend:
+      [ ] List semua halaman (/app/**) dan komponen.
+      [ ] Pastikan semua aksi UI memanggil API yang benar dan handle error (toast + fallback UI).
+      [ ] Validasi semua form (zod/react-hook-form) dan state loading/empty.
+      [ ] Cek kembali interceptor Axios dan alur redirect RequireAuth.
+
+[x] 0.3 Buat FUNGSI yang belum ada namun dipanggil
+    - Cari referensi import/usage yang tidak memiliki implementasi.
+    - Implementasikan minimal:
+      [x] /api/classes (GET list, GET detail, GET students by class)
+      [x] Frontend classesAPI agar tidak lagi memakai mock (src/lib/data.ts).
+      [x] Users management (admin) CRUD dasar.
+    - Tambahkan unit test minimal untuk fungsi baru.
+
+[x] 0.4 Health check menyeluruh
+    - Jalankan “lint”, “type-check”, dan “build” pada FE/BE hingga bersih.
+    - Smoke test manual alur: Login → Dashboard → Isi Absensi → Laporan → Export Excel.
+    - Dokumentasikan hasil di /docs/HEALTHCHECK.md beserta screenshot singkat.
+
+[x] 0.5 Kriteria Selesai (wajib)
+    - Tidak ada route 404 yang seharusnya ada.
+    - Tidak ada error tak tertangani di console FE/BE saat alur utama dijalankan.
+    - Semua halaman memiliki loading state, empty state, dan error state.
+
+============================================================
+1) OVERVIEW ARSITEKTUR TINGKAT TINGGI
+============================================================
+[x] 1.1 Gambar diagram arsitektur (PNG + Mermaid) di /docs/architecture.(png|md)
+    - Layer: Client (Next.js) → API (Express) → MySQL
+    - Komponen: Auth (JWT), RBAC, Attendance, Reports, Export, AI (scaffold)
+[x] 1.2 Tulis ringkasan keputusan arsitektur (ADR) di /docs/adr/001-architecture.md
+
+============================================================
+2) ALUR DATA END-TO-END (LOGIN → ABSENSI → LAPORAN)
+============================================================
+[x] 2.1 Sequence diagram untuk 3 alur:
+    - Login (username/password → JWT + profil)
+    - Isi Absensi (teacher.today → attendance.save)
+    - Laporan (filter kelas/bulan → export Excel)
+[ ] 2.2 Subtil penting: untuk akun guru, frontend menyimpan teacher.id sebagai user.id
+    - Verifikasi semua panggilan API yang butuh teacher_id sudah konsisten.
+[x] 2.3 Tulis /docs/flows.md yang merinci status, error case, dan retry policy.
+
+============================================================
+3) SKEMA DATABASE & RELASI
+============================================================
+Tabel inti: users, teachers, classes, students, subjects, schedules, attendance_records
+
+[ ] 3.1 Validasi FK, UNIQUE, dan INDEX
+    - attendance_records: UNIQUE (student_id, schedule_id, attendance_date)
+    - INDEX: schedules (teacher_id, class_id, day_of_week), attendance_records (schedule_id, attendance_date)
+[ ] 3.2 Tambah migration untuk constraint/index yang kurang.
+[ ] 3.3 Seed data contoh dan skrip rollback/redo (npm run db:reset).
+
+============================================================
+4) API ENDPOINTS & SECURITY
+============================================================
+[x] 4.1 Dokumentasi OpenAPI (yaml/json) minimal untuk /api/** di /docs/openapi.yaml
+[x] 4.2 Implement missing routes “/api/classes”
+    - GET /classes
+    - GET /classes/:id
+    - GET /classes/:id/students
+[ ] 4.3 Validasi request body/query (zod/joi) + error handler seragam.
+[x] 4.4 Middleware keamanan
+    - helmet (profil prod), express-rate-limit (100/15m, env-configurable)
+    - cors (origin dari env, allow credentials jika pakai cookie)
+[x] 4.5 Auth
+    - Verifikasi JWT di semua route terlindungi.
+    - requireRole([’admin’, ’teacher’]) sesuai kebutuhan.
+    - [Opsional] Refresh token + HttpOnly cookie jika migrasi dari localStorage.
+[x] 4.6 Logging & observability
+    - morgan (combined) + korelasi request-id.
+
+============================================================
+5) AUTH, ROLES, & GUARD
+============================================================
+[x] 5.1 Frontend RequireAuth
+    - Redirect ke /login jika token hilang/invalid (client side).
+    - Tampilkan loading guard saat verifikasi /auth/me.
+[x] 5.2 Role-aware UI
+    - Menu & aksi hanya tampil sesuai role (admin/teacher).
+[ ] 5.3 [Opsional] SSR guard/middleware Next.js
+    - Aktif bila token dipindah ke cookie; jika masih localStorage, dokumentasikan limitasinya.
+
+============================================================
+6) UI/UX — DESAIN & KOMPONEN
+============================================================
+[x] 6.1 Konsistensi gaya (Tailwind + shadcn/ui)
+    - Palet warna, tipografi, spacing, radius, shadow seragam.
+[x] 6.2 Komponen dasar
+    - <AppShell> (Sidebar + Header), <DataTable>, <Form> (zod + RHF), <StatusBadge>.
+[x] 6.3 Aksesibilitas
+    - Kontras minimal AA, fokus ring, label form, aria-live untuk toast.
+[ ] 6.4 Dark mode (optional) via class strategy.
+[x] 6.5 Micro-UX
+    - Skeleton & spinner, toast sukses/error, shortcut keyboard sederhana.
+
+============================================================
+7) HALAMAN & INTERAKSI
+============================================================
+[x] 7.1 Login
+    - Card terpusat, validasi realtime, pesan error jelas.
+[x] 7.2 Dashboard (guru)
+    - “Sesi Hari Ini”, ringkasan % kehadiran, tombol “Isi Absensi” cepat.
+    - Slot “Prediksi Ketidakhadiran” (AI) begitu terhubung.
+[x] 7.3 Attendance
+    - Header lengket (kelas & tanggal), toolbar (Tandai Semua Hadir, Simpan).
+    - Tabel siswa: NIS, avatar/initial, radio status (Hadir/Izin/Sakit/Alpa/Dispen) dengan warna.
+[x] 7.4 Reports
+    - Filter kelas/bulan/tahun, tabel kompak S/I/A/D + % hadir.
+    - Unduh Excel via /reports/export (auth header).
+[x] 7.5 Classes (REAL DATA, bukan mock)
+    - Tabel kelas: wali kelas, jumlah siswa; dialog tambah/edit.
+[x] 7.6 Users (admin)
+    - CRUD user (username, role) + link ke teacher (jika role=teacher).
+[x] 7.7 NotFound & ErrorBoundary halaman umum.
+
+============================================================
+8) AI — PREDIKSI ABSENSI (SCAFFOLD → TERINTEGRASI)
+============================================================
+[ ] 8.1 Service backend untuk agregasi historis absensi per siswa.
+[ ] 8.2 Fungsi scoring sederhana (threshold dinamis, mis. > p95 ketidakhadiran).
+[ ] 8.3 Endpoint /ai/alerts?classId=&month=&year= (role teacher/admin).
+[ ] 8.4 Card di Dashboard: “Students at Risk” + link detail.
+[ ] 8.5 Jadwal job harian (cron) untuk recompute.
+
+============================================================
+9) GAP TERCATAT & PERBAIKAN
+============================================================
+[x] 9.1 Tambahkan /api/classes (lihat 4.2) dan ganti data mock di FE.
+[x] 9.2 Users page (admin-only) belum ada — implement.
+[x] 9.3 Integrasi AI ke UI (dashboard) + job periodik.
+[x] 9.4 Pertegas konfigurasi environment (.env contoh untuk FE/BE).
+[ ] 9.5 Dokumentasi SSR guard (opsional) & rencana migrasi token ke cookie.
+
+============================================================
+10) KUALITAS KODE & PENGUJIAN
+============================================================
+[ ] 10.1 Lint & format konsisten (ESLint + Prettier) FE/BE.
+[ ] 10.2 Unit test minimal: controller attendance, util laporan.
+[ ] 10.3 Integration test: alur save attendance (transaksi DB).
+[ ] 10.4 E2E test (Playwright/Cypress): Login → Isi Absensi → Laporan → Export.
+[ ] 10.5 Postman/Insomnia collection untuk /api/** di /docs/api-collection.json.
+
+============================================================
+11) DEVOPS, BUILD, & DEPLOY
+============================================================
+[x] 11.1 Skrip npm lengkap:
+    - backend: dev, build, start, lint, test, db:migrate, db:seed, db:reset
+    - frontend: dev, build, start, lint, typecheck
+[ ] 11.2 Template Docker (opsional) + docker-compose (db + api + app).
+[ ] 11.3 Pipeline CI sederhana (lint, test, build).
+[x] 11.4 Dokumen “How to Run”:
+    - Urutan: migrate → seed → start backend → set NEXT_PUBLIC_API_URL → start frontend.
+[ ] 11.5 Checklist rilis: versi, changelog, tag git.
+
+============================================================
+12) VALIDASI AKHIR & SERAH TERIMA
+============================================================
+[ ] 12.1 Demo internal: jalankan semua alur tanpa error.
+[ ] 12.2 Cek akses role: admin vs teacher (UI & API).
+[ ] 12.3 Review performa (N+1 query, pagination daftar siswa).
+[x] 12.4 Arsipkan mock & hapus dead code.
+[ ] 12.5 Tandai semua item checklist selesai di commit final.
+
+============================================================
+LAMPIRAN — RANGKUMAN ENDPOINT (INTI)
+============================================================
+Auth
+- POST /auth/login → JWT + profil (guru: id, nip, full_name)
+- GET  /auth/me → profil berjalan dari token
+
+Students (admin untuk tulis)
+- GET  /students?class_id=&search=
+- GET  /students/:id
+- POST /students
+- PUT  /students/:id
+- DELETE /students/:id
+
+Classes (BARU)
+- GET  /classes
+- GET  /classes/:id
+- GET  /classes/:id/students
+
+Attendance (teacher/admin)
+- GET  /attendance/teacher/:teacherId/today
+- GET  /attendance/schedule/:scheduleId?date=YYYY-MM-DD
+- POST /attendance/record
+
+Reports (teacher/admin)
+- GET  /reports/class/:classId?month=&year=
+- GET  /reports/export?classId=&month=&year=
+
+AI (opsional, setelah aggregator siap)
+- GET  /ai/alerts?classId=&month=&year=
+
+============================================================
+DEFINISI SELESAI (DoD)
+============================================================
+- Build FE/BE lulus tanpa error, lint bersih, test inti lulus.
+- Semua alur utama berfungsi: Login → Dashboard → Absensi → Laporan → Export.
+- Tidak ada ketergantungan pada data mock.
+- Dokumen /docs lengkap (arsitektur, flows, openapi, how-to-run, audit, healthcheck).
+- Checklist ini ditandai selesai 100%.

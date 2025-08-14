@@ -1,6 +1,6 @@
-import { SidebarProvider } from '@/components/ui/sidebar';
-import { DashboardSidebar } from '@/components/dashboard-sidebar';
-import { DashboardHeader } from '@/components/dashboard-header';
+import { RequireAuth } from "@/components/require-auth";
+import { DashboardHeader } from "@/components/dashboard-header";
+import { DashboardSidebar } from "@/components/dashboard-sidebar";
 
 export default function DashboardLayout({
   children,
@@ -8,14 +8,16 @@ export default function DashboardLayout({
   children: React.ReactNode;
 }) {
   return (
-    <SidebarProvider>
-      <div className="flex min-h-screen w-full flex-col bg-app-background">
+    <RequireAuth>
+      <div className="grid min-h-screen w-full bg-[#F5EEFF] md:grid-cols-[240px_1fr] lg:grid-cols-[280px_1fr]">
         <DashboardSidebar />
-        <div className="flex flex-col sm:pl-14 group-[[data-state=expanded]]/sidebar-wrapper:sm:pl-64 transition-[padding-left] duration-300">
+        <div className="flex flex-col">
           <DashboardHeader />
-          <main className="flex-1 p-4 sm:p-6 md:p-8">{children}</main>
+          <main className="flex flex-1 flex-col gap-4 p-4 md:p-6 lg:p-8">
+            {children}
+          </main>
         </div>
       </div>
-    </SidebarProvider>
+    </RequireAuth>
   );
 }
